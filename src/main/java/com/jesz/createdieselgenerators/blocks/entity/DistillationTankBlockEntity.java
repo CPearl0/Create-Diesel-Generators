@@ -225,14 +225,15 @@ public class DistillationTankBlockEntity extends SmartBlockEntity implements IMu
         removeController(true);
         lastKnownPos = worldPosition;
     }
-    protected List<Recipe<?>> getMatchingRecipes() {
 
-        List<Recipe<?>> list = RecipeFinder.get( new Object(), level, recipe -> recipe.getType() == RecipeRegistry.DISTILLATION.getType());
+    private static final Object RECIPE_CACHE_KEY = new Object();
+    protected List<Recipe<?>> getMatchingRecipes() {
+        List<Recipe<?>> list = RecipeFinder.get(RECIPE_CACHE_KEY, level, recipe -> recipe.getType() == RecipeRegistry.DISTILLATION.getType());
         return list.stream()
                 .filter(r -> !((DistillationRecipe) r).getFluidIngredients().isEmpty() && (((DistillationRecipe) r).getFluidIngredients().get(0).getMatchingFluidStacks().contains(tankInventory.getFluid()) && ((DistillationRecipe) r).getFluidIngredients().get(0).getRequiredAmount() <= tankInventory.getFluidAmount() && getHeat(((DistillationRecipe) r).getRequiredHeat()) <= heat))
                 .collect(Collectors.toList());
-
     }
+
     int getHeat(HeatCondition heatCondition){
         if(heatCondition == HeatCondition.SUPERHEATED)
             return 2;
